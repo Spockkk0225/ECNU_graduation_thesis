@@ -6,6 +6,7 @@
 本章首先会介绍分布式图计算的相关背景，以及分布式图计算的技术综述，然后会给出分布式最短路径的相关算法。
 
 \section{分布式图计算的背景}
+\label{sec:distribution_background}
 
 图计算的一个瓶颈时当图的规模很大时，无法像传统算法一样快速并行计算。近年来，大量的分布式图处理框架和算法被提出，用于快速地将传统算法移植到分布式环境中。
 
@@ -19,47 +20,54 @@
 \end{itemize}
 
 \section{分布式图计算的划分算法}
+\label{sec:distribution_partition}
 
 图算法的并行较为复杂。一方面，图算法往往有较强的顺序关系，例如Dijkstra算法通过特定的计算顺序才能保证最优性；另一方面，图结构的局部性并不直观，如果按照传统的编号划分，一个节点的邻域往往会分布在不同机器中。因此，许多研究也提出了相关的计算框架，将这些复杂的底层问题抽象成固定的计算模式。
-
-\begin{figure}[h]
-    \centering
-        \begin{subfigure}{0.275\linewidth}
-            \centering
-            \includegraphics[width=0.8\linewidth]{figures/challenge_partition_a.pdf}
-            \caption{The Vertex Partitioning}
-            \label{fig:challenge_partition_vertex}
-        \end{subfigure}
-    \hspace{-1em}
-        \begin{subfigure}{0.35\linewidth}
-            \centering
-            \includegraphics[width=1.0\linewidth]{figures/challenge_partition_b.pdf}
-            \caption{The Edge Partitioning}
-            \label{fig:challenge_partition_edge}
-        \end{subfigure}
-    \hspace{-1em}
-        \begin{subfigure}{0.3\linewidth}
-            \centering
-            \includegraphics[width=0.65\linewidth]{figures/challenge_partition_c.pdf}
-            \caption{The Hybrid Partitioning}
-            \label{fig:challenge_partition_hybrid}
-        \end{subfigure}
-     \caption{三种常见的图划分算法。}
-    \label{fig:challenge_partition}
-\end{figure}
 
 图划分算法的任务是将一个完整的图划分为多个子图存放在不同的机器中，一个好的划分算法能够尽量减少子图之间的通讯数据量，尽量保证本地计算的高效性。常见的图划分算法包含以下三种：
 \begin{itemize}
     \item 点划分。点划分是最基础的划分算法，即以点作为划分单元，分配到不同的机器上。如果一条边的两个点都在同一台机器上，那么这条边只会被本地访问；否则，这条边可能会产生跨机器的通讯，称之为割边。如图~\ref{fig:challenge_partition_vertex}所示，边$(u_1, v_1)$就是一条割边。点划分的目标是尽量减少割边的数量。
+    
+    \begin{figure}[h]
+        \centering
+            \begin{subfigure}{0.4\linewidth}
+                \centering
+                \includegraphics[width=0.8\linewidth]{figures/challenge_partition_a.pdf}
+            \end{subfigure}
+         \caption{点划分示意图。}
+        \label{fig:challenge_partition_vertex}
+    \end{figure}
 
     \item 边划分。和点划分的定义类似，边划分以边作为划分单元，分配到不同的机器上。不同的是，一个点的边可能出现在多台机器上，称之为割点，因此无法采用传统的点对点同步方式，而是将其中一个点设为实际存储点，而将其他点作为镜像点，每次同步时镜像点和实际存储点之间进行同步操作。如图~\ref{fig:challenge_partition_edge}所示，点 $v_1$ 就是一个割点。边划分的目标是尽量减少割点的数量。
     
+    \begin{figure}[h]
+        \centering
+            \begin{subfigure}{0.6\linewidth}
+                \centering
+                \includegraphics[width=0.8\linewidth]{figures/challenge_partition_b.pdf}
+            \end{subfigure}
+         \caption{边划分示意图。}
+        \label{fig:challenge_partition_edge}
+    \end{figure}
+    
     \item 混合划分。注意到点划分和边划分都很容易引起负载均衡问题。一个割边或割点较少的划分并不意味子图的大小时平衡的，例如图~\ref{fig:challenge_partition_vertex}和图~\ref{fig:challenge_partition_edge}中的子图大小相差过大。为了解决这一问题，混合划分集成了点划分的思路，但不再以割边为衡量目标，而是综合考虑各种参数，例如节点的度数、节点的连通度、节点的计算量等，直接量化估计整体的划分质量。图~\ref{fig:challenge_partition_hybrid}是一个优化后的划分，虽然存在三条割边，但是八个节点均匀的分配到两个子图中。
+    
+    \begin{figure}[h]
+        \centering
+            \begin{subfigure}{0.4\linewidth}
+                \centering
+                \includegraphics[width=0.8\linewidth]{figures/challenge_partition_c.pdf}
+            \end{subfigure}
+         \caption{混合划分示意图。}
+        \label{fig:challenge_partition_hybrid}
+    \end{figure}
+
 \end{itemize}
 
 
 
 \section{分布式图计算的计算模式}
+\label{sec:distribution_model}
 
 目前，主流的图计算模式都依赖于块同步并行模型（Bulk Synchronous Parallelism，BSP）。BSP模型的思想是将计算任务分为多个超步，每个超步包含以下三个阶段：
 
@@ -162,6 +170,7 @@ compute(subgraph sg):
 
 
 \section{常见图计算平台上的最短路径算法实现}
+\label{sec:distribution_algorithm}
 
 由于各个图计算平台的接口各不相同，各自的实现方式也有很大差异，因此下面会给出一些常见的计算平台的基本介绍，以及这些计算平台上的最短路径算法实现。
 
@@ -189,7 +198,7 @@ MergeMessage(distance dist1, distance dist2):
 
 \subsection{PowerGraph平台}
 
-PowerGraph 是一个分布式图处理系统，设计用于高效地处理大规模图数据。它采用以边为中心的计算模式，特别擅长应对具有幂律分布特性的图（即少数节点拥有大量的连接，而大多数节点只有少量连接），这类图在实际应用中非常常见，例如社交网络、网页链接结构等。
+PowerGraph 是一个高效的分布式图处理系统，设计用于高效地处理大规模图数据。它采用以边为中心的计算模式，特别擅长应对具有幂律分布特性的图（即少数节点拥有大量的连接，而大多数节点只有少量连接），这类图在实际应用中非常常见，例如社交网络、网页链接结构等。
 
 PowerGraph 的执行引擎经过优化，能够在大规模集群上高效地执行图算法。它利用了内存计算的优势，避免使用hadoop导致的IO开销，并通过减少不必要的数据传输来提高性能。
 
@@ -257,7 +266,7 @@ compute(vertex u):
             send_message(v, u.dist + w)
 \end{lstlisting}
 
-
+\vspace{-1em}
 \subsection{Grape平台}
 
 Grape平台是一个以块为中心的计算平台，专门用于优化最短路径这一类和图的直径直接有关的问题。Grape包含两个用户函数，PartialEvaluation（PEval）和IncrementalComputation（IncEval），分别用于块内的初始化计算，以及经过同步后的增量计算。
@@ -472,8 +481,8 @@ Grape这种以块为中心的计算模式介于Dijkstra算法和Bellman-Ford算�
 \end{itemize}
 在实际应用中，则需要根据不同的落地需求综合考虑多个因素选取计算平台，包括：
 \begin{itemize}
-    \item 应用场景。对于大规模的分布式计算，GraphX这种带有容错机制的平台显然是最合适的；而对于小规模的快速开发，单机的Ligra则更加合适。
-    \item 性能需求。如果对性能有较高的要求，应优先考虑那些在运行时间测试和扩展性测试中表现出色的平台，如Grape和PowerGraph。
-    \item 算法需求。由于分布式算法编写难度较高，如果用户需要其他更加复杂的图算法，Flash提供的大量图算法会带来帮助。
+    \item 应用场景。对于大规模的分布式计算，GraphX这种带有全面容错机制的平台显然是最合适的，PowerGraph和Pregel+也在一定程度上提供了容错能力；而对于小规模的快速开发，单机的Ligra则更加合适。
+    \item 性能需求。如果对性能有较高的要求，应优先考虑那些在运行时间测试和扩展性测试中表现出色的平台，如Grape和PowerGraph，这些平台提供了极致的性能优化，能够最快地完成计算任务。
+    \item 算法需求。由于分布式算法编写难度较高，如果用户需要其他更加复杂的图算法，Flash提供的大量图算法会带来帮助。并且Flash包含了大量在顶级会议上最新发表的高效算法，可以带来更高的效率。
     \item 兼容性需求。在一些情况下需要和已有数据和算法兼容，例如GraphX可以直接对接Spark处理后的数据，Pregel+也可以直接运行Pregel编写的代码，而无需过多的修改。
 \end{itemize}
