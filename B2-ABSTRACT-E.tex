@@ -1,0 +1,18 @@
+\newpage
+\vspace{-1cm}
+\chapter*{\xiaosan \heiti{ABSTRACT}}
+\addcontentsline{toc}{chapter}{Abstract}
+\vspace{-0.5cm}
+
+Kernel Density Estimation (KDE) has become a popular method for visual analysis in various fields, such as financial risk forecasting, crime clustering, and traffic monitoring.
+KDE can fit discrete data points into a continuous distribution, enabling the prediction of values at any place. Subsequently, through normalization, the values can be mapped to a finite range for coloring and visualization purposes.
+
+However, most existing works only consider planar distance and spatial data. In this thesis, we introduce a new model, called TN-KDE, that applies KDE-based techniques to road networks with temporal data. In TN-KDE, each data point contains coordinate information and time information, using the shortest path distance as the distance metric, which more accurately reflects the actual conditions on road networks.
+
+Specifically, we introduce a novel solution, Range Forest Solution (RFS), which can efficiently compute KDE values on spatiotemporal road networks. To support the insertion operation, we present a dynamic version, called Dynamic Range Forest Solution (DRFS). We also propose an optimization called Lixel Sharing (LS) to share similar KDE values between two adjacent lixels.
+
+Finally, considering the computational bottleneck of massive shortest path calculation, this thesis also explores the possibility of distributed computation of shortest paths. We provide implementations of shortest path algorithms on several common distributed computing platforms.
+
+\hspace{-0.5cm}
+{\sihao{\textbf{Keywords:}}}
+\textit{Kernel Density Estimation; Data Visualization; Spatio-Temporal Data; Shortest Path}

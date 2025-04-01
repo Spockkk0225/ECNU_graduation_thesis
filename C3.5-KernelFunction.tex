@@ -1,0 +1,113 @@
+\section{非多项式核函数}
+\label{sec7:kernel}
+
+上述的核密度计算中我们使用最为常见的三角核方程作为示例，由于其可被划分为查询向量$\mathbf{Q}$和聚合向量$\mathbf{A}$的特性，使得我们可对核密度的计算进行加速。其他多项式核函数，例如Epanechnikov核函数也有相同的性质。然而，许多非多项式核函数，例如指数核函数和余弦核函数，无法直接通过这种方式进行分解。
+
+已有的工作尝试使用多项式核函数来逼近非多项式核函数，例如双线性函数逼近 \cite{chan_karl_2019} 和二次函数逼近\cite{chan_quad_2020}。这些方法能够达到较好的精度，然而逼近函数的参数选择极为复杂，并且误差仍然存在且无法收敛。
+
+为了解决这一问题，我们的框架可以直接支持这些非多项式核函数，并且同样可以拆分为查询向量和聚合向量的乘积：
+\begin{equation*}
+	F_\Gamma(q)= \mathbf{Q}(q) \cdot \mathbf{A}(\Gamma)
+\end{equation*}
+
+
+
+\subsection{指数核函数}
+
+指数核函数的定义如下：
+\begin{equation*}
+	K(x) = e^{-x}
+\end{equation*}
+
+为了简化问题，我们只展示空间维度上的变换，即$K_s(x) = e^{-x}$， $K_t(x) = 1$。此时，核密度为：
+\begin{equation*}
+\begin{aligned}
+	F_{\Gamma}(q) &= \sum_{o_i \in \Gamma} e^{-\frac{d(q, v_c) + d(v_c, p_i)}{b_s}} \\
+	&= e^{-d(q, v_c)/b_s} \sum_{o_i \in \Gamma} e^{-d(v_c, p_i)/b_s}
+\end{aligned}
+\end{equation*}
+
+此时，查询向量和聚合向量分别为：
+\begin{equation*}
+\begin{aligned}
+	\mathbf{Q}(q) &= e^{-d(q, v_c)/b_s} \quad
+	\mathbf{A}(\Gamma) &= \sum_{o_i \in \Gamma} e^{-d(v_c, p_i)/b_s}
+\end{aligned}
+\end{equation*} 
+
+\subsection{余弦核函数}
+
+另一个被广泛使用的核函数是余弦核函数：
+\begin{equation*}
+	K(x) = \cos(x)
+\end{equation*}
+
+余弦核函数的分解需要利用三角函数的变换性质：
+\begin{equation*}
+	\begin{aligned}
+		F_\Gamma(q)
+		=& \sum_{o_i \in \Gamma} \cos\left(d(q, v_c)/b_s + d(v_c, p_i)/b_s\right) \\
+		=& \sum_{o_i \in \Gamma} \left[\cos \frac{d(q, v_c)}{b_s} \cos \frac{d(v_c, p_i)}{b_s} - \sin \frac{d(q, v_c)}{b_s} \sin \frac{d(v_c, p_i)}{b_s}\right] \\
+		=& \cos \frac{d(q, v_c)}{b_s} \sum_{o_i \in \Gamma} \cos \frac{d(v_c, p_i)}{b_s} 
+		-  \sin \frac{d(q, v_c)}{b_s} \sum_{o_i \in \Gamma} \sin \frac{d(v_c, p_i)}{b_s}
+	\end{aligned}
+\end{equation*}
+
+此时，查询向量和聚合向量分别为：
+\begin{equation*}
+	\mathbf{Q}(q) = 
+	\begin{bmatrix}
+		\cos \frac{d(q, v_c)}{b_s} \\
+		-\sin \frac{d(q, v_c)}{b_s}
+	\end{bmatrix}^\top
+	\quad
+	\mathbf{A}(\Gamma) = 
+	\begin{bmatrix}
+		\sum_{o_i \in \Gamma} \cos \frac{d(v_c, p_i)}{b_s} \\
+		\sum_{o_i \in \Gamma} \sin \frac{d(v_c, p_i)}{b_s}
+	\end{bmatrix}
+\end{equation*}
+
+\subsection{高维情况下的核密度公式}
+
+无论是空间核函数还是时间核函数，都可以任意选择核函数进行组合：
+\begin{equation*}
+\begin{aligned}
+	F_\Gamma(q) &= \Big[\mathbf{Q}_s(q) \cdot \mathbf{A}_s(\Gamma)\Big] \cdot \Big[\mathbf{Q}_t(q) \cdot \mathbf{A}_t(\Gamma)\Big] \\
+	&=\left(\sum_i \mathbf{Q}_i(q) \cdot \mathbf{A}_i(\Gamma)\right) \cdot \left(\sum_j \mathbf{Q}_j(q) \cdot \mathbf{A}_j(\Gamma)\right) \\
+	&=\sum_{i,j} \mathbf{Q}_{ij}(q) \cdot \mathbf{A}_{ij}(\Gamma)
+\end{aligned}
+\end{equation*}
+
+其中$\mathbf{Q}_{ij}(q)=\mathbf{Q}_i(q) \cdot \mathbf{Q}_j(q)$ and $\mathbf{A}_{ij}(\Gamma)=\mathbf{A}_i(\Gamma) \cdot \mathbf{A}_j(\Gamma)$。最后的查询向量和聚合向量的大小$\vert \mathbf{A}_{ij} \vert$ 最大为 $\vert \mathbf{A}_i \vert \cdot \vert \mathbf{A}_j \vert$，即两个维度上的相关变量的两两组合，在实际计算中可以视作常数。
+
+
+%\subsection{Gaussian Kernel Function?}
+%
+%Gaussian Kernel Function
+%\begin{equation}
+%	G(x) = e^{-x^2 \big/ 4\delta}
+%\end{equation}
+%
+%has a squared exponential form and the division equation does not hold. We can of course replace $x$ by $x / 4\delta$ in Taylor's expansion, but we want to find a more efficient and ordinary way to approximate it.
+%
+%Here we use the sum-of-exponentials(SOE) approximations to expand the squared exponential function into the sum of a series of exponential functions:
+%\begin{equation}
+%	G(x) \approx \sum_{k=1}^{n} w_k e^{-t_k \vert x \vert \big/ \sqrt{\delta}}
+%\end{equation}
+%Since we always use a positive distance value, the absolute function can be removed directly. Here, $w_k$ and $t_k$ are two parameters representing different integral region. So the density value can be computed by:
+%\begin{equation}
+%\begin{aligned}
+%	\lambda_{\Gamma_e}(\textbf{q}) = \sum_{i=1}^{\vert \Gamma_e \vert} G(d_i) 
+%	= \sum_{i=1}^{\vert \Gamma_e \vert} \sum_{k=1}^{n} w_k e^{-t_k d_i \big/ \sqrt{\delta}} 
+%	= \sum_{k=1}^{n} \left( \sum_{i=1}^{\vert \Gamma_e \vert} w_k e^{-t_k d_i \big/ \sqrt{\delta}} \right)
+%\end{aligned}\notag
+%\end{equation}
+%For each $k$, the equation in brackets is a sum of exponential functions, which is discussed in [ch5.1].
+
+
+
+
+
+
+%\clearpage
