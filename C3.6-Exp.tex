@@ -35,25 +35,25 @@ New York	& 55765           & 92229           & 38400730        & 416            
 
 \begin{figure*}[p!]\centering
 	\hspace{-8pt}
-	\scalebox{0.3}[0.3]{\includegraphics{./figures/EXP_Bandwidth_R.pdf}}
+	\scalebox{0.3}[0.3]{\includegraphics{./figures/EXP_Bandwidth_R_zh.pdf}}
 	\vspace{-8pt}
 	\caption{不同空间范围带宽（50m，1000m，3000m，5000m）下的处理时间。}
 	\label{exp1.1}
 	
 	\vspace{10pt}
-	\scalebox{0.3}[0.3]{\includegraphics{./figures/EXP_Bandwidth_W.pdf}}
+	\scalebox{0.3}[0.3]{\includegraphics{./figures/EXP_Bandwidth_W_zh.pdf}}
 	\vspace{-8pt}
 	\caption{不同查询数量（5，10，15，20，25）下的处理时间。}
 	\label{exp1.2}
 	
 	\vspace{10pt}
-	\scalebox{0.3}[0.3]{\includegraphics{./figures/EXP_Bandwidth_L.pdf}}
+	\scalebox{0.3}[0.3]{\includegraphics{./figures/EXP_Bandwidth_L_zh.pdf}}
 	\vspace{-8pt}
 	\caption{不同线段点长度（5m，10m，30m，50m）下的处理时间。}
 	\label{exp1.3}
 	
 	\vspace{10pt}
-	\scalebox{0.3}[0.3]{\includegraphics{./figures/EXP_Bandwidth_P.pdf}}
+	\scalebox{0.3}[0.3]{\includegraphics{./figures/EXP_Bandwidth_P_zh.pdf}}
 	\vspace{-8pt}
 	\caption{不同时间窗口大小（25\%，50\%，75\%，100\%）下的处理时间。}
 	\label{exp1.4}
@@ -79,7 +79,7 @@ New York	& 55765           & 92229           & 38400730        & 416            
 \textbf{内存开销。} 图~\ref{exp1.5} 展示了三种算法的内存使用情况。由于SPS算法不需要任何额外的空间，其内存使用量可以视为数据集本身的大小。其他两种算法（RFS算法和ADA算法）的内存使用仅与数据点数量相关。RFS算法在构建森林索引时仅需消耗相当于ADA算法3倍和SPS算法8倍的内存。考虑到复杂的索引结构，这样的内存开销是可以接受的。
 
 \begin{figure}[h]\centering
-	\scalebox{0.6}[0.6]{\includegraphics{./figures/EXP_Memory.pdf}}
+	\scalebox{0.6}[0.6]{\includegraphics{./figures/EXP_Memory_zh.pdf}}
 	\caption{不同算法消耗的内存对比。}
 	\label{exp1.5}
 \end{figure}
@@ -92,7 +92,7 @@ New York	& 55765           & 92229           & 38400730        & 416            
 \textbf{高效性。} 为了说明索引和处理过程中的时间消耗，图~\ref{exp2.1} 和图~\ref{exp2.2} 分别展示了索引时间和处理时间。即使当 $H=10$ 时，DRFS算法构建索引所需的时间也很少，并且在大数据集（例如 NewYork）上甚至比RFS算法更快。大约来说，RFS算法的效果等同于$H \approx 8$的DRFS算法。在处理时间方面，不同的高度$H$之间没有显著差异。由于在一个查询批次中索引部分只执行一次，即使$H$较大，DRFS算法在高效性上依然表现良好。
 
 \begin{figure}[h]\centering
-	\scalebox{0.5}[0.5]{\includegraphics{./figures/EXP_H_PrepareTime.pdf}}
+	\scalebox{0.5}[0.5]{\includegraphics{./figures/EXP_H_PrepareTime_zh.pdf}}
 	\vspace{-1em}
 	\caption{不同高度 $H$ 所需要的索引时间对比。}
 	\label{exp2.1}
@@ -100,7 +100,7 @@ New York	& 55765           & 92229           & 38400730        & 416            
 
 \begin{figure}[h]\centering
 	\vspace{-1em}
-	\scalebox{0.5}[0.5]{\includegraphics{./figures/EXP_H_RunningTime.pdf}}
+	\scalebox{0.5}[0.5]{\includegraphics{./figures/EXP_H_RunningTime_zh.pdf}}
 	\vspace{-1em}
 	\caption{不同高度 $H$ 下的查询时间对比。}
 	\label{exp2.2}
@@ -109,7 +109,7 @@ New York	& 55765           & 92229           & 38400730        & 416            
 \textbf{有效性。} 由于DRFS算法是一种近似算法，我们也需要考虑其有效性，即计算出的核密度值是否准确。所有实验报告的准确率结果如图~\ref{exp2.3}所示。即使在 $H=2$ 的情况下，准确率仍然超过94\%。此外，随着 $H$ 的增加，准确性迅速提升，当 $H=10$ 时，所有四个数据集上的准确率均超过了99.9\%。
 
 \begin{figure}[h]\centering
-	\scalebox{0.5}[0.5]{\includegraphics{./figures/EXP_H_Accuracy.pdf}}
+	\scalebox{0.5}[0.5]{\includegraphics{./figures/EXP_H_Accuracy_zh.pdf}}
 	\vspace{-1em}
 	\caption{不同高度 $H$ 下的答案准确度对比。}
 	\label{exp2.3}
@@ -118,7 +118,7 @@ New York	& 55765           & 92229           & 38400730        & 416            
 \textbf{内存开销。}  图~\ref{exp2.4} 显示了两种算法的内存开销，这反映了索引的大小。其趋势与图~\ref{exp2.1} 类似，等效边界同样是 $H \approx 8$。当 $H=2$ 时，内存消耗接近ADA算法，表明我们量化策略的可行性。此外，内存使用的增长比率几乎是线性的且可以预测，这可以帮助用户选择合适的参数 $H$。
 
 \begin{figure}[h]\centering
-	\scalebox{0.5}[0.5]{\includegraphics{./figures/EXP_H_Memory.pdf}}
+	\scalebox{0.5}[0.5]{\includegraphics{./figures/EXP_H_Memory_zh.pdf}}
 	\caption{不同高度 $H$ 所需要的内存开销对比。}
 	\label{exp2.4}
 \end{figure}
